@@ -4,7 +4,8 @@
 const int tempPin1 = 0;
 const int tempPin2 = 1
 //LCD pin #s
-
+const int rs = 12, en = 11, d4 = 5, d5 = 4, d6 = 3, d7 = 2;
+LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
 
 
 //Environment Variables
@@ -12,6 +13,9 @@ bool Celsius = false, Light = false;
 
 void setup()
 {
+lcd.begin(16,2);
+lcd.print("Calibrating");
+delay(1000);
 }
 
 void loop()
@@ -26,7 +30,9 @@ void loop()
     temperature2 = getTemperature(voltage);
 
 
-    delay(1000);
+lcd.print("In: " + String(temperature1,1) + " Out:" + String(temperature2,1));
+
+    delay(5000);
 }
 
     //Global variable Celsius tell getTemperature in what format to out. Celsius = true, fahrenheit = false
