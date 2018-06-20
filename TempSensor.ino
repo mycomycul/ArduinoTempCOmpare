@@ -1,5 +1,6 @@
+#include "LiquidCrystal.h"
 
-//Thermometer pin #s
+//Thermometer pin #s. Set these to analog pins attached to sensors
 const int tempPin1 = 0;
 const int tempPin2 = 1
 //LCD pin #s
