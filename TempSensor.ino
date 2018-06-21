@@ -21,11 +21,21 @@
 // include the library code:
 #include <LiquidCrystal.h>
 
-// initialize the library with the numbers of the interface pins
+
+/*TODO Update temperature calculation to based off 1023 to eliminate getVoltage()
+
+*/
+
+// initialize LCD library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 6, 5, 4, 3);
+//Set to control LCD light
+const int ledPin = 7;
+
+//Set temperature probe pins
 const int tempPin1 = A0;
 const int tempPin2 = A1;
-const int ledPin = 7;
+
+//Set fahrenheit to celsius formatting button pin
 const int button = 2;
 
 //Environment Variables
@@ -43,36 +53,30 @@ void setup() {
   pinMode(ledPin, OUTPUT);
   digitalWrite(ledPin, HIGH);
   
-  //Setup Button Interrupt  
+  //Setup Button 
   pinMode(button, INPUT_PULLUP);
 
 }
 
 void loop() {
-   float voltage, temperature1, temperature2;
-   int sensorVal = digitalRead(2);
-//Check for button push to change format
-  if (sensorVal == LOW)
-  {Celsius = !Celsius;}
-//Get the first sensor's value and convert it to a temperature
-    voltage = getVoltage(tempPin1);
-    temperature1 = getTemperature(voltage);
-//Get the second sensor's value and convert it to a temperature
-    voltage = getVoltage(tempPin2);
-    temperature2 = getTemperature(voltage);
-  // set the cursor to column 0, line 1
-  // (note: line 1 is the second row, since counting begins with 0):
-	lcd.clear();
-  lcd.setCursor(0, 0);
-  String s = String(temperature1,1);
-  // print the number of seconds since reset:
-  lcd.print("In:" + String(temperature1,1));
-	lcd.setCursor(0, 1);
-    lcd.print("Out:" + String(temperature2,1));
+   checkButton()
+   checkTemperature()
+   updateLCD()
   delay(1000);
 }
- 
-float getTemperature(float voltage)
+void checkTemperature(){
+//Get the first sensor's value and convert it to a temperature
+    voltage =getVoltage(tempPin1);
+    temperature1 = calculateTemperature(voltage);
+//Get the second sensor's value and convert it to a temperature
+    voltage =  getVoltage(tempPin2);
+    temperature2 = calculateTemperature(voltage);
+}
+float getVoltage(int pin)
+{
+    return (analogRead(pin) * 0.004882814);
+}
+float calculateTemperature(float voltage)
 {
     if (Celsius == true)
     {
@@ -84,15 +88,24 @@ float getTemperature(float voltage)
     }
 }
 
-float getVoltage(int pin)
-{
-
-    return (analogRead(pin) * 0.004882814);
-
-    // This equation converts the 0 to 1023 value that analogRead()
-    // returns, into a 0.0 to 5.0 value that is the true voltage
-    // being read at that pin.
+void updateLCD(){
+    	lcd.clear();   
+  // set the cursor to column 0, line 1
+  lcd.setCursor(0, 0);
+  String s = String(temperature1,1);
+  // print temperature
+  lcd.print("In:" + String(temperature1,1));
+	lcd.setCursor(0, 1);
+    lcd.print("Out:" + String(temperature2,1));
 }
+
+
+void checkButton (){
+   int sensorVal = digitalRead(2);
+//Check for button push to change format
+  if (sensorVal == LOW)
+  {Celsius = !Celsius;}
+} 
 void celsiusButton(){
   Celsius = !Celsius;
 }
