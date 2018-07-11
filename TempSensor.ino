@@ -21,7 +21,6 @@
 // include the library code:
 #include <LiquidCrystal.h>
 
-
 /*TODO Update temperature calculation to based off 1023 to eliminate getVoltage()
 
 */
@@ -41,36 +40,41 @@ const int button = 2;
 //Environment Variables
 bool Celsius = false;
 bool Light = false;
+float tempInside, tempOutside;
+bool WarmerInside = true;
 
-void setup() {
-  // set up the LCD's number of columns and rows:
-  lcd.begin(16, 2);
-  // Print a message to the LCD.
-  lcd.print("Calibrating");
-  delay(1500);
-  
-  //Set the LCD LED Pin to OutPut
-  pinMode(ledPin, OUTPUT);
-  digitalWrite(ledPin, HIGH);
-  
-  //Setup Button 
-  pinMode(button, INPUT_PULLUP);
+void setup()
+{
+    // set up the LCD's number of columns and rows:
+    lcd.begin(16, 2);
+    // Print a message to the LCD.
+    lcd.print("Calibrating");
+    delay(1500);
 
+    //Set the LCD LED Pin to OutPut
+    pinMode(ledPin, OUTPUT);
+    digitalWrite(ledPin, LOW);
+
+    //Setup Button
+    pinMode(button, INPUT_PULLUP);
 }
 
-void loop() {
-   checkButton()
-   checkTemperature()
-   updateLCD()
-  delay(1000);
+void loop()
+{
+    chkCelsiusBtn();
+    chkTemp();
+    checkForTempSwap();
+    updateLCD();
+    delay(1000);
 }
-void checkTemperature(){
-//Get the first sensor's value and convert it to a temperature
-    voltage =getVoltage(tempPin1);
-    temperature1 = calculateTemperature(voltage);
-//Get the second sensor's value and convert it to a temperature
-    voltage =  getVoltage(tempPin2);
-    temperature2 = calculateTemperature(voltage);
+void chkTemp()
+{
+    //Get the first sensor's value and convert it to a temperature
+    voltage = getVoltage(tempPin1);
+    tempInside = calculateTemperature(voltage);
+    //Get the second sensor's value and convert it to a temperature
+    voltage = getVoltage(tempPin2);
+    tempOutside = calculateTemperature(voltage);
 }
 float getVoltage(int pin)
 {
@@ -87,25 +91,46 @@ float calculateTemperature(float voltage)
         return ((voltage - 0.5) * 100.0) * (9.0 / 5.0) + 32.0;
     }
 }
+checkForTempSwap()
+{
+    bool tempSwapCheck = WarmerInside;
+    if (tempInside < tempOutside)
+    {
+        WarmerInside = false;
+    }
+    else
+    {
+        WarmerInside = true;
+    }
 
-void updateLCD(){
-    	lcd.clear();   
-  // set the cursor to column 0, line 1
-  lcd.setCursor(0, 0);
-  String s = String(temperature1,1);
-  // print temperature
-  lcd.print("In:" + String(temperature1,1));
-	lcd.setCursor(0, 1);
-    lcd.print("Out:" + String(temperature2,1));
+    if (tmpSwapCheck != WarmerInside)
+    {
+        alertTempSwap();
+    }
+}
+alertTempSwap()
+{
+// Create code to light up LCD
+
 }
 
+void updateLCD()
+{
+    lcd.clear();
+    // set the cursor to column 0, line 1
+    lcd.setCursor(0, 0);
+    String s = String(tempInside, 1);
+    // print temperature
+    lcd.print("In:" + String(tempInside, 1));
+    lcd.setCursor(0, 1);
+    lcd.print("Out:" + String(tempOutside, 1));
+}
 
-void checkButton (){
-   int sensorVal = digitalRead(2);
-//Check for button push to change format
-  if (sensorVal == LOW)
-  {Celsius = !Celsius;}
-} 
-void celsiusButton(){
-  Celsius = !Celsius;
+void chkCelsiusBtn()
+{
+    int sensorVal = digitalRead(2);
+    if (sensorVal == LOW);
+    {
+        Celsius = !Celsius;
+    }
 }
