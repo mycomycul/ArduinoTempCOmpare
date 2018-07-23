@@ -48,18 +48,17 @@ long tempInside, tempOutside;
 
 bool WarmerInside = true;
 bool SwapAlert = false;
-unsigned long AlertPeriod = 60000;
+unsigned long AlertPeriod = 8000;
 unsigned long AlertTime;
-int BrightnessIncrementor = 5
+int BrightnessIncrementor = 2;
 
-    void
-    setup()
+void   setup()
 {
     // set up the LCD's number of columns and rows:
     lcd.begin(16, 2);
     // Print a message to the LCD.
     lcd.print("Calibrating");
-    delay(1500);
+    //delay(1500);
 
     //Setup the LCD pin and turn to off
     pinMode(ledPin, OUTPUT);
@@ -73,17 +72,21 @@ void loop()
 {
     chkCelsiusBtn();
     chkTemp();
-    checkForTempSwap();
     updateLCD();
-    while (SwapAlert == true)
+ 
+    if (SwapAlert == true)
     {
         alertTempSwap();
     }
+  else{
+  checkForTempSwap();
+  }
 }
 void chkTemp()
 {
     //Get the first sensor's value and convert it to a temperature
-    voltage = getVoltage(tempPin1);
+    float voltage = getVoltage(tempPin1);
+  	
     tempInside = calculateTemperature(voltage);
     //Get the second sensor's value and convert it to a temperature
     voltage = getVoltage(tempPin2);
@@ -104,7 +107,7 @@ float calculateTemperature(float voltage)
         return ((voltage - 0.5) * 100.0) * (9.0 / 5.0) + 32.0;
     }
 }
-checkForTempSwap()
+void checkForTempSwap()
 {
     bool tempSwapCheck = WarmerInside;
     if (tempInside < tempOutside)
@@ -116,13 +119,13 @@ checkForTempSwap()
         WarmerInside = true;
     }
 
-    if (tmpSwapCheck != WarmerInside)
+    if (tempSwapCheck != WarmerInside)
     {
         SwapAlert = true;
         AlertTime = millis();
     }
 }
-alertTempSwap()
+void alertTempSwap()
 {
     long currentTime = millis();
     //Check how long the alert has run
@@ -130,15 +133,18 @@ alertTempSwap()
     {
         LedBrightness = LedBrightness + BrightnessIncrementor;
         analogWrite(ledPin, LedBrightness);
-        //Reverse Fade
-        if (LedBrightness >= 250 || LedBrightness <= 5)
+        if (LedBrightness >= 255 - abs(BrightnessIncrementor) || LedBrightness < abs(BrightnessIncrementor))
         {
-            BrightnessIncrementor = !BrightnessIncrementor;
+            BrightnessIncrementor = -BrightnessIncrementor;
         }
+
+        //Reverse Fade
     }
     //Turn off alert if alertperiod has passed
     else{
         SwapAlert = false;
+      	LedBrightness = 0;
+      	analogWrite(ledPin, LedBrightness);
     }
 }
 
@@ -149,16 +155,15 @@ void updateLCD()
     lcd.setCursor(0, 0);
     String s = String(tempInside, 1);
     // print temperature
-    lcd.print("In:" + String(tempInside, 1));
+    lcd.print("In:" + String(tempInside));
     lcd.setCursor(0, 1);
-    lcd.print("Out:" + String(tempOutside, 1));
+    lcd.print("Out:" + String(tempOutside) + " B:" + String(LedBrightness));
 }
 
 void chkCelsiusBtn()
 {
     int sensorVal = digitalRead(2);
     if (sensorVal == LOW)
-        ;
     {
         Celsius = !Celsius;
     }
