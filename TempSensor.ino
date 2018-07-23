@@ -21,8 +21,9 @@
 // include the library code:
 #include <LiquidCrystal.h>
 
-/*TODO Update temperature calculation to based off 1023 to eliminate getVoltage()
-
+/*TODO 
+Update temperature calculation to based off 1023 to eliminate getVoltage()
+Fix checkForTempSwap() to work 
 */
 
 // initialize LCD library for tinkercad
@@ -43,16 +44,16 @@ const int button = 2;
 
 //Environment Variables
 bool Celsius = false;
-bool Light = false;
+bool updateDisplay = true;
 long tempInside, tempOutside;
 
 bool WarmerInside = true;
 bool SwapAlert = false;
 unsigned long AlertPeriod = 8000;
 unsigned long AlertTime;
-int BrightnessIncrementor = 2;
+int BrightnessIncrementor = 1;
 
-void   setup()
+void setup()
 {
     // set up the LCD's number of columns and rows:
     lcd.begin(16, 2);
@@ -70,27 +71,38 @@ void   setup()
 
 void loop()
 {
-    chkCelsiusBtn();
-    chkTemp();
-    updateLCD();
- 
+    
+    updateDisplay = chkCelsiusBtn();
+    bool tempChanged = chkTemp();
+    if (tempChanged == true)
+    {        
+        checkForTempSwap();
+        updateDisplay = true;
+    }
     if (SwapAlert == true)
     {
         alertTempSwap();
     }
-  else{
-  checkForTempSwap();
-  }
+    if (updateDisplay == true){
+        updateLCD();
+    }
 }
-void chkTemp()
+bool chkTemp()
 {
-    //Get the first sensor's value and convert it to a temperature
-    float voltage = getVoltage(tempPin1);
-  	
-    tempInside = calculateTemperature(voltage);
-    //Get the second sensor's value and convert it to a temperature
+    bool tempsChanged = false;
+    //Get sensor values and convert to temperature
+    float voltage = getVoltage(tempPin1);    
+    long tempTempInside = calculateTemperature(voltage);
     voltage = getVoltage(tempPin2);
-    tempOutside = calculateTemperature(voltage);
+    long tempTempOutside = calculateTemperature(voltage);
+    //Check if the temperature has changed
+    if (tempTempInside != tempInside || tempTempOutside != tempOutside){
+        tempsChanged = true;
+    }
+    tempInside = tempTempInside;
+    tempOutside = tempTempOutside;
+    return tempsChanged;
+
 }
 float getVoltage(int pin)
 {
@@ -107,6 +119,7 @@ float calculateTemperature(float voltage)
         return ((voltage - 0.5) * 100.0) * (9.0 / 5.0) + 32.0;
     }
 }
+
 void checkForTempSwap()
 {
     bool tempSwapCheck = WarmerInside;
@@ -141,30 +154,41 @@ void alertTempSwap()
         //Reverse Fade
     }
     //Turn off alert if alertperiod has passed
-    else{
+    else
+    {
         SwapAlert = false;
-      	LedBrightness = 0;
-      	analogWrite(ledPin, LedBrightness);
+        LedBrightness = 0;
+        analogWrite(ledPin, LedBrightness);
     }
 }
 
 void updateLCD()
 {
+    char tempType;
+    if(Celsius == true){
+        tempType = 'C';
+    }
+    else{
+        tempType = 'F';
+    }
     lcd.clear();
     // set the cursor to column 0, line 1
     lcd.setCursor(0, 0);
     String s = String(tempInside, 1);
     // print temperature
-    lcd.print("In:" + String(tempInside));
+    lcd.print("In:" + String(tempInside) + tempType);
     lcd.setCursor(0, 1);
-    lcd.print("Out:" + String(tempOutside) + " B:" + String(LedBrightness));
+    lcd.print("Out:" + String(tempOutside) + tempType);
+    updateDisplay = false;
 }
 
-void chkCelsiusBtn()
+bool chkCelsiusBtn()
 {
     int sensorVal = digitalRead(2);
     if (sensorVal == LOW)
     {
         Celsius = !Celsius;
+        return true;
     }
+        return false;
 }
