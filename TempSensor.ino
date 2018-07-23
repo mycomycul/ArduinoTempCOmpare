@@ -25,10 +25,14 @@
 
 */
 
-// initialize LCD library with the numbers of the interface pins
+// initialize LCD library for tinkercad
 LiquidCrystal lcd(12, 11, 6, 5, 4, 3);
-//Set to control LCD light
 const int ledPin = 7;
+int LedBrightness = 0;
+
+//Display Pins for Dr.Rob ot
+//LiquidCrystal lcd(8,9,4,5,6,7);
+//const int ledPin = 10;
 
 //Set temperature probe pins
 const int tempPin1 = A0;
@@ -40,10 +44,16 @@ const int button = 2;
 //Environment Variables
 bool Celsius = false;
 bool Light = false;
-float tempInside, tempOutside;
-bool WarmerInside = true;
+long tempInside, tempOutside;
 
-void setup()
+bool WarmerInside = true;
+bool SwapAlert = false;
+unsigned long AlertPeriod = 60000;
+unsigned long AlertTime;
+int BrightnessIncrementor = 5
+
+    void
+    setup()
 {
     // set up the LCD's number of columns and rows:
     lcd.begin(16, 2);
@@ -51,7 +61,7 @@ void setup()
     lcd.print("Calibrating");
     delay(1500);
 
-    //Set the LCD LED Pin to OutPut
+    //Setup the LCD pin and turn to off
     pinMode(ledPin, OUTPUT);
     digitalWrite(ledPin, LOW);
 
@@ -65,7 +75,10 @@ void loop()
     chkTemp();
     checkForTempSwap();
     updateLCD();
-    delay(1000);
+    while (SwapAlert == true)
+    {
+        alertTempSwap();
+    }
 }
 void chkTemp()
 {
@@ -105,13 +118,28 @@ checkForTempSwap()
 
     if (tmpSwapCheck != WarmerInside)
     {
-        alertTempSwap();
+        SwapAlert = true;
+        AlertTime = millis();
     }
 }
 alertTempSwap()
 {
-// Create code to light up LCD
-
+    long currentTime = millis();
+    //Check how long the alert has run
+    if (currentTime - AlertTime <= AlertPeriod)
+    {
+        LedBrightness = LedBrightness + BrightnessIncrementor;
+        analogWrite(ledPin, LedBrightness);
+        //Reverse Fade
+        if (LedBrightness >= 250 || LedBrightness <= 5)
+        {
+            BrightnessIncrementor = !BrightnessIncrementor;
+        }
+    }
+    //Turn off alert if alertperiod has passed
+    else{
+        SwapAlert = false;
+    }
 }
 
 void updateLCD()
@@ -129,7 +157,8 @@ void updateLCD()
 void chkCelsiusBtn()
 {
     int sensorVal = digitalRead(2);
-    if (sensorVal == LOW);
+    if (sensorVal == LOW)
+        ;
     {
         Celsius = !Celsius;
     }
