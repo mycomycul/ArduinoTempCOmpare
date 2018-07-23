@@ -23,7 +23,8 @@
 
 /*TODO 
 Update temperature calculation to based off 1023 to eliminate getVoltage()
-Fix checkForTempSwap() to work 
+Fix alertTempSwap to work with BrightnessIncrementor of 1. To increase fade time consider
+    multiplying the LedBrightness by 10 and use for increment but divide when setting pin.
 */
 
 // initialize LCD library for tinkercad
@@ -123,7 +124,7 @@ float calculateTemperature(float voltage)
 void checkForTempSwap()
 {
     bool tempSwapCheck = WarmerInside;
-    if (tempInside < tempOutside)
+    if (tempInside <= tempOutside)
     {
         WarmerInside = false;
     }
