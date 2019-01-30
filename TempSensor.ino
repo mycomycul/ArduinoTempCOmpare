@@ -8,13 +8,17 @@
  * LCD D5 pin to digital pin 5
  * LCD D6 pin to digital pin 4
  * LCD D7 pin to digital pin 3
+ * LCD LED pin to 220 resistor to pin 7
  * LCD R/W pin to ground
  * LCD VSS pin to ground
  * LCD VCC pin to 5V
+ * TMP1 VOut pin to A0
+ * TMP2 VOut pint to A1
+ * BTN Terminal 1 to digital pin 2
+ * BTN Terminal 2 to GND
  * 10K resistor:
  * ends to +5V and ground
  * wiper to LCD VO pin (pin 3)
-
 
 
 */
@@ -50,7 +54,7 @@ long tempInside, tempOutside;
 
 bool WarmerInside = true;
 bool SwapAlert = false;
-unsigned long AlertPeriod = 8000;
+unsigned long AlertPeriod = 800;
 unsigned long AlertTime;
 int BrightnessIncrementor = 1;
 
@@ -147,10 +151,15 @@ void alertTempSwap()
     {
         LedBrightness = LedBrightness + BrightnessIncrementor;
         analogWrite(ledPin, LedBrightness);
-        if (LedBrightness >= 255 - abs(BrightnessIncrementor) || LedBrightness < abs(BrightnessIncrementor))
+        if (LedBrightness >= 255 - abs(BrightnessIncrementor))
         {
             BrightnessIncrementor = -BrightnessIncrementor;
         }
+        else if(LedBrightness < abs(BrightnessIncrementor))
+        {
+          	BrightnessIncrementor = abs(BrightnessIncrementor);
+        }
+        
 
         //Reverse Fade
     }
