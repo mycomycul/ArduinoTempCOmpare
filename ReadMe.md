@@ -6,7 +6,7 @@ In the heat of the summer, I would check the thermometer outside all morning for
 ## Getting Started 
 
 * Wire hardware and load TempSensor.ino with your favorite Arduino IDE
-* Adjust how long the LCD brightness fades in and out after a temperature swap has been detected by setting th value of AlertPeriod, line ~57
+* Adjust how long the LCD brightness fades in and out after a temperature swap has been detected by setting the value of AlertPeriod, line ~57
 * Load on to Arduino
 
 Press button to switch between Celsius and Fahrenheit
