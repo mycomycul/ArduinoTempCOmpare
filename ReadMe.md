@@ -1,7 +1,7 @@
 # Arduino Temp Compare
 Arduino Program that displays the temperature on two digital thermometers on an LCD display and lights up if the temperature on one sensor becomes greater or less than the other.
 
-In the heat of the summer, I would check the thermometer outside all morning for when it started to be hotter outside and I needed to turn off the box fan and close the windows and blinds to preserve the cool indoor temperature and then repeat the process in reverse each evening. Wiring two thermometers to an arduino with this little program, I can see both temperatures in one spot and get a visual cue of a fading in and out light when the temperature has swapped so I don't miss it and spend more time in a baking apartment than necessary. 
+In the heat of the summer, I would check the thermometer outside all morning for when it started to be hotter outside and I needed to turn off the box fan and close the windows and blinds to preserve the cool indoor temperature. I'd then repeat the process in reverse each evening. Wiring two thermometers to an arduino with this little program, I can see both temperatures in one spot and get a visual cue of a fading in and out light when the temperature has swapped so I don't miss it and spend more time in a baking apartment than necessary. 
 
 ## Getting Started 
 
@@ -32,3 +32,7 @@ Press button to switch between Celsius and Fahrenheit
 ### Wiring Diagram
 ![Wiring Diagram](./ArduinoTempCompare.png)
 
+## Try It Out
+To test the application online create a TinkerCad account, click the link below and select "Copy and Tinker".
+
+[TinkerCad Arduino Temp Compare](https://www.tinkercad.com/things/heJVZbuhrdK)
